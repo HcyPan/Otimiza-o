@@ -7,6 +7,8 @@ using matrix = vector<vector<float> > ;
 // Função
 class MathFunctions {
   public: 
+    enum getStepFunction { Armijo = 1, GoldenSect = 2 };
+
     void printMat(const matrix &C);
     void printVec(const vector<float> &C);
     
@@ -15,12 +17,17 @@ class MathFunctions {
 
     matrix matMul(const matrix &A, const matrix &B);
     vector<float> matVecMul(const vector<float> &A, const matrix &B);
+    float vecMul(const vector<float> &A, const vector<float> &B);
+    void vecMulFloat(vector<float> &A, float B);
     matrix matSum(const matrix &A, const matrix &B);
     matrix matSumValue(const matrix &A, const float B);
     
     float funcObj(const vector<float> &X);
-    float phi(const vector<float> &X, const vector<float> &dX, float t);
+    float phi(const vector<float> &X, const vector<float> &dir, float t);
     vector<float> gradF(const vector<float> &X);
+    float goldenSection(const vector<float> &X,  const vector<float> &dir);
+    float armijo(const vector<float> &X,  const vector<float> &dir);
+    vector<float> gradient(const vector<float> &X, int stepFunction);
 };
 
 // // Seção Áurea
@@ -28,7 +35,7 @@ class MathFunctions {
 // 	float eps = 1, ro = 1;
 // 	float dt1 = (3-sqrt(5))/2;
 // 	float dt2 = 1-dt1;
-// 	float a = 0, s = ro , b = 2*ro;
+// 	float a = 0, s = ro , b = 2*ro;bele
 	
 	
 // 	while (phi(x1,x2,d1,d2,b) < phi(x1,x2,d1,d2,s){

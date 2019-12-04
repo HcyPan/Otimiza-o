@@ -52,6 +52,22 @@ void allFunctions(){
   cout << endl <<  "gradF Function Result" << endl << endl;
   m_func.printVec(dX);
 
+  float goldSect = m_func.goldenSection(vector <float> {5,6}, vector <float> {2,3});
+  cout << endl <<  "Golden Section Function Result" << endl << endl;
+  cout << goldSect << endl;
+
+  float armijo = m_func.armijo(vector <float> {5,6}, vector <float> {2,3});
+  cout << endl <<  "Armijo Function Result" << endl << endl;
+  cout << armijo << endl;
+
+  vector<float> gradientArmijo = m_func.gradient(vector <float> {5,6}, MathFunctions::getStepFunction::Armijo);
+  cout << endl <<  "Gradient Function By Armijo Result" << endl << endl;
+  m_func.printVec(gradientArmijo);
+
+  vector<float> gradientGoldSec = m_func.gradient(vector <float> {5,6}, MathFunctions::getStepFunction::GoldenSect);
+  cout << endl <<  "Armijo Function By Golden Section Result" << endl << endl;
+  m_func.printVec(gradientGoldSec);
+
   cout << endl << "Fnished" << endl;
 }
 
