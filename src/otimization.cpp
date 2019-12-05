@@ -9,7 +9,8 @@
 #define GOLDENSECTIONRO 1
 #define ARMIJON 0.25
 #define ARMIJOY 0.8
-
+#define RANDOMMAX 1000
+#define MAXITERS 100
 
 using namespace std;
 using matrix = vector<vector<float> >;
@@ -34,7 +35,7 @@ matrix MathFunctions::matMul(const matrix &A, const matrix &B){
   return C;
 };
 
-vector<float> MathFunctions::matVecMul(const vector<float> &A, const matrix &B){
+vector<float> MathFunctions::vecMatMul(const vector<float> &A, const matrix &B){
 
   const int r = B.size();     // a rows
   const int c = B[0].size();  // a cols
@@ -44,7 +45,24 @@ vector<float> MathFunctions::matVecMul(const vector<float> &A, const matrix &B){
   for (int i = 0; i < r; ++i){
       float aux = 0;
       for (int j = 0; j < c; ++j){
-          aux += A[j] * B[i][j];
+          aux += A[j] * B[j][i];
+      }
+      V[i] = aux;
+  }
+  return V;
+};
+
+vector<float> MathFunctions::matVecMul(const matrix &A, const vector<float> &B){
+
+  const int r = A.size();     // a rows
+  const int c = A[0].size();  // a cols
+
+  vector<float> V = vector<float>(c, 0);
+
+  for (int i = 0; i < r; ++i){
+      float aux = 0;
+      for (int j = 0; j < c; ++j){
+          aux += B[j] * A[i][j];
       }
       V[i] = aux;
   }
@@ -61,11 +79,27 @@ float MathFunctions::vecMul(const vector<float> &A, const vector<float> &B){
   return aux;
 }
 
-void MathFunctions::vecMulFloat(vector<float> &A, float B){
+vector<float> MathFunctions::vecMulFloat(vector<float> &A, float B){
   const int r = A.size();     // size of vector
+  vector<float> V = vector<float>(r, 0);
+
   for (int i = 0; i < r; ++i){
-    A[i] = A[i]*B;
+    V[i] = A[i]*B;
   }
+
+  return V
+}
+
+vector<float> MathFunctions::vecMagicOperation(vector<float> &A, vector<float> &B, float C){
+  const int r = A.size();     // size of vector
+  
+  vector<float> V = vector<float>(r, 0);
+
+  for (int i = 0; i < r; ++i){
+    V[i] = A[i] + C*B[i];
+  }
+
+  return V
 }
 
 matrix MathFunctions::matSum(const matrix &A, const matrix &B){
@@ -99,17 +133,16 @@ matrix MathFunctions::matSumValue(const matrix &A, const float B){
 };
 
 void MathFunctions::initializeMat(matrix &A){
-  const int c_start = rand() % 100 + 1;
   for (int i = 0; i < A.size(); i++){
     for (int j = 0; j < A[0].size(); j++){
-        A[i][j] = i*j + c_start;
+        A[i][j] = rand() % RANDOMMAX + 1;
     }
   }
 };
 
 void MathFunctions::initializeVec(vector<float> &A){
   for (int i = 0; i < A.size(); i++){
-      A[i] = rand() % 100 + 1;
+      A[i] = rand() % RANDOMMAX + 1;
   }
 };
 
@@ -135,7 +168,7 @@ float MathFunctions::funcObj(const vector<float> &X){
 }
 
 float MathFunctions::phi(const vector<float> &X, const vector<float> &dir, const float t){
-  vector<float> r = {X[0]+t*dir[0], X[1]+t*dir[1]};
+  vector<float> r = vecMagicOperation(X, dir, t);
   return funcObj(r);
 }
 
@@ -159,8 +192,11 @@ float MathFunctions::goldenSection(const vector<float> &X, const vector<float> &
   }
 
   float ba = b-a;
-  float u = a + delta[0]*ba;
-  float v = a + delta[1]*ba;
+
+  vector<float> newDelta = vecMulFloat(delta, ba)
+
+  float u = a + newDelta[0];
+  float v = a + newDelta[1];
 
   while ((b-a) > eps){
     if (phi(X, dir, u) < phi(X, dir, v)){
@@ -191,36 +227,87 @@ float MathFunctions::armijo(const vector<float> &X, const vector<float> &dir){
   return t;
 }
 
-vector<float> MathFunctions::gradient(const vector<float> &X, int stepFunction){
+bool MathFunctions::isVecEqual(vector<float> &A, vector<float> &B){
+  const int r = A.size();  //size of vec
+  bool C = true
+
+  for (int i = 0; i < r; i++){
+      C = C && (A[i] == B[i]);
+  }
+
+  return C
+}
+
+vector<float> MathFunctions::gradient(const vector<float> &X, int stepFunction, int iteration = 0){
+  iteration++;
+  
+  if (iteration == MAXITERS){
+    return X;
+  }
+
   vector<float> grad = gradF(X);
 
   float t = 0;
 
   if (grad[0] != 0 && grad[1] != 0){
-    vecMulFloat(grad, -1);
+    vector<float> dir = vecMulFloat(grad, -1);
     if (stepFunction == 1){
-      t = armijo(X, grad);
+      t = armijo(X, dir);
     }else{
-      t = goldenSection(X, grad);
+      t = goldenSection(X, dir);
     }
-    vecMulFloat(grad, t);
+    
+    vector<float> returnValue = vecMagicOperation(X, dir, t)
 
-    return gradient(vector<float> {X[0] + grad[0], X[1] + grad[1]}, stepFunction);
+    if (isVecEqual(X, returnValue)){ //checks if new X is equal
+      return X;
+    }
+
+    return gradient(returnValue, stepFunction);
   }
+
   return X;
 }
 
-// void Gradient(x1,x2)[
-// 	vector<float> grad = gradf(x1,x2);
-// 	vector<float> x = x.push_back(x1).push_back(x2);
-// 	vector<float> xk;
-// 	if (grad.at(0) != 0 && grad.at(1) != 0) {
-// 		vector<float> d = d.push_back(-grad.at(0)).push_back(-grad.at(1));
-// 		// obter t>0 onde f(x+td)>f(x) por Armijo ou Seção Áurea
-// 		xk.push_back(x1 + t*d.at(0)).push_back(x2 + t*d.at(1));
-// 		return Gradient(xk.at(0),xk.at(1));
-// 	}
-// 	else {
-// 		return x;
-// 	}
-// ]
+matrix MathFunctions::hessianInverted(vector<float> &X){
+  float denominator = pow(X[0],6) * pow(X[1],6)  - 9 * pow(X[0],4) * pow(X[1],4) + 7 * pow(X[0],2) * pow(X[1],2) + 1
+  float secondDiogonal = (4 * pow(X[0],3) * pow(X[1],3) * (pow(X[0],2) * pow(X[1],2) + 1))/denominator
+  float firstDiagonal11 = (-pow(X[1],6) * pow(X[0],8) + 3 * pow(X[1],4) * pow(X[0], 6) + 5* pow(X[1], 2) * pow(X[0], 4) + pow(X[0],2))/denominator
+  float firstDiagonal22 = (-pow(X[0],6) * pow(X[1],8) + 3 * pow(X[0],4) * pow(X[1], 6) + 5* pow(X[0], 2) * pow(X[1], 4) + pow(X[1],2))/denominator
+
+  return {{firstDiagonal11, secondDiogonal}, {secondDiogonal, firstDiagonal22}}
+}
+
+
+vector<float> MathFunctions::newton(const vector<float> &X, int stepFunction, int iteration = 0){
+  iteration++;
+  
+  if (iteration == MAXITERS){
+    return X;
+  }
+
+  vector<float> grad = gradF(X);
+
+  float t = 0;
+
+  if (grad[0] != 0 && grad[1] != 0){
+    matrix HI = hessianInverted(X)
+    vector<float> dir = -1 * matVecMul(HI, grad);
+    if (stepFunction == 1){
+      t = armijo(X, dir);
+    }else{
+      t = goldenSection(X, dir);
+    }
+    
+    vector<float> returnValue = vecMagicOperation(X, dir, t)
+
+    if (isVecEqual(X, returnValue)){ //checks if new X is equal
+      return X;
+    }
+
+    return newton(returnValue, stepFunction);
+  }
+
+  return X;
+}
+

@@ -36,7 +36,7 @@ void allFunctions(){
   cout << endl <<  "Matrix Summed Value Result" << endl << endl;
   m_func.printMat(S2);
 
-  vector<float> VR = m_func.matVecMul(V,A);
+  vector<float> VR = m_func.vecMatMul(V,A);
   cout << endl <<  "Matrix Vector Multiplication Result" << endl << endl;
   m_func.printVec(VR);
 
