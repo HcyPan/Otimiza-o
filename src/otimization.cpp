@@ -35,6 +35,21 @@ matrix MathFunctions::matMul(const matrix &A, const matrix &B){
   return C;
 }
 
+matrix MathFunctions::matMulValue(const matrix &A, const float B){
+  
+  const int r = A.size();     // a rows
+  const int c = A[0].size();  // a cols
+
+  matrix S = matrix(r, vector<float>(c, 0));
+
+  for (int i = 0; i < r; ++i){
+      for (int j = 0; j < c; ++j){
+          S[i][j] = A[i][j] * B;
+      }
+  }
+  return S;
+}
+
 vector<float> MathFunctions::vecMatMul(const vector<float> &A, const matrix &B){
 
   const int r = B.size();     // a rows
@@ -100,6 +115,34 @@ vector<float> MathFunctions::vecMagicOperation(const vector<float> &A, const vec
   }
 
   return V;
+}
+
+matrix MathFunctions::matDivValue(const matrix &A, const float B){
+  
+  const int r = A.size();     // a rows
+  const int c = A[0].size();  // a cols
+
+  matrix S = matrix(r, vector<float>(c, 0));
+
+  for (int i = 0; i < r; ++i){
+      for (int j = 0; j < c; ++j){
+          S[i][j] = A[i][j] / B;
+      }
+  }
+  return S;
+}
+
+matrix MathFunctions::vecSum(const vector<float> &A, const vector<float> &B){
+
+  const int r = A.size();     // size of vector
+
+  matrix S = matrix(r, vector<float>(c, 0));
+
+  for (int i = 0; i < r; ++i){
+          S[i] = A[i] + B[i];
+      }
+  }
+  return S;
 }
 
 matrix MathFunctions::matSum(const matrix &A, const matrix &B){
@@ -262,12 +305,14 @@ vector<float> MathFunctions::gradient(const vector<float> &X, int stepFunction, 
 
     if (isVecEqual(X, returnValue)){ //checks if new X is equal
       cout << "Finished after X equals to new X. " << endl;
+      cout << "Iterations:" << iteration << endl;
       return X;
     }
 
     return gradient(returnValue, stepFunction, iteration);
   }
   cout << "Finished because grad is 0" << endl;
+  cout << "Iterations:" << iteration << endl;
   return X;
 }
 
@@ -307,12 +352,63 @@ vector<float> MathFunctions::newton(const vector<float> &X, int stepFunction, in
 
     if (isVecEqual(X, returnValue)){ //checks if new X is equal
       cout << "Finished after X equals to new X" << endl;
+      cout << "Iterations:" << iteration << endl;
       return X;
     }
 
     return newton(returnValue, stepFunction, iteration);
   }
   cout << "Finished because grad is 0" << endl;
+  cout << "Iterations:" << iteration << endl;
   return X;
 }
 
+vector<float> MathFunctions::quasiNewton(const vector<float> &X, matrix &H, int stepFunction, int iteration){
+  iteration++;
+  
+  if (iteration == MAXITERS){
+    cout << "Finished after max iteration steps: " << iteration << endl;
+    return X;
+  }
+
+  vector<float> grad = gradF(X);
+
+  float t = 0;
+
+  if (grad[0] != 0 && grad[1] != 0){
+    vector<float> Hgrad = matVecMul(H, grad);
+    vector<float> dir = vecMulFloat(Hgrad, -1);
+    if (stepFunction == 1){
+      t = armijo(X, dir);
+    }else{
+      t = goldenSection(X, dir);
+    }
+    
+    vector<float> returnValue = vecMagicOperation(X, dir, t);
+
+    vector<float> minusX = vecMulFloat(X, -1);
+    vector<float> minusGrad = vecMulFloat(grad, -1);
+    vector<float> nextGrad = gradF(returnValue);
+    vector<float> p = vecSum(returnValue, minusX);
+    vector<float> q = vecSum(nextGrad, minusGrad);
+    float pq = vecMul(p, q);
+    float pp = vecMul(p, p);
+    vector<float> qH = vecMatMul(q, H);
+    vector<float> Hq = matVecMul(H, q);
+    float firstPart = (1 + vecMul(qH, q)/pq)*pp/pq;
+    matrix secondPartNumerator = matSumValue(matMulValue(H, pq),vecMul(Hq, p));
+    matrix secondPart = matMulValue(matDivValue(secondPartNumerator, pq), -1);
+    matrix newH = matSum(matSumValue(H, firstPart), secondPart);
+
+    if (isVecEqual(X, returnValue)){ //checks if new X is equal
+      cout << "Finished after X equals to new X" << endl;
+      cout << "Iterations:" << iteration << endl;
+      return X;
+    }
+
+    return quaseNewton(returnValue, newH, stepFunction, iteration);
+  }
+  cout << "Finished because grad is 0" << endl;
+  cout << "Iterations:" << iteration << endl;
+  return X;
+}
