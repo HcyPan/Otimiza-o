@@ -14,6 +14,7 @@ class MathFunctions {
     
     void initializeMat(matrix &A);
     void initializeVec(vector<float> &A);
+    matrix initializeMatIdentity(int size);
 
     bool isVecEqual(const vector<float> &A, vector<float> &B);
 
@@ -22,8 +23,9 @@ class MathFunctions {
     vector<float> vecMatMul(const vector<float> &A, const matrix &B);
     vector<float> matVecMul(const matrix &A, const vector<float> &B);
     float vecMul(const vector<float> &A, const vector<float> &B);
-    vector<float> vecMulFloat(vector<float> &A, float B);
+    vector<float> vecMulFloat(const vector<float> &A, float B);
     vector<float> vecMagicOperation(const vector<float> &A, const vector<float> &B, float C);
+    vector<float>  vecSum(const vector<float> &A, const vector<float> &B);
 
     matrix matDivValue(const matrix &A, const float B);
 
@@ -31,7 +33,6 @@ class MathFunctions {
 
     matrix matSum(const matrix &A, const matrix &B);
     matrix matSumValue(const matrix &A, const float B);
-    matrix vecSum(const vector<float> &A, const vector<float> &B);
     
     float funcObj(const vector<float> &X);
     float phi(const vector<float> &X, const vector<float> &dir, float t);

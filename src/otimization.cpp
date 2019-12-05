@@ -94,7 +94,7 @@ float MathFunctions::vecMul(const vector<float> &A, const vector<float> &B){
   return aux;
 }
 
-vector<float> MathFunctions::vecMulFloat(vector<float> &A, float B){
+vector<float> MathFunctions::vecMulFloat(const vector<float> &A, float B){
   const int r = A.size();     // size of vector
   vector<float> V = vector<float>(r, 0);
 
@@ -132,17 +132,16 @@ matrix MathFunctions::matDivValue(const matrix &A, const float B){
   return S;
 }
 
-matrix MathFunctions::vecSum(const vector<float> &A, const vector<float> &B){
+vector<float> MathFunctions::vecSum(const vector<float> &A, const vector<float> &B){
 
   const int r = A.size();     // size of vector
 
-  matrix S = matrix(r, vector<float>(c, 0));
+  vector<float> V = vector<float>(r, 0);
 
   for (int i = 0; i < r; ++i){
-          S[i] = A[i] + B[i];
-      }
+    V[i] = A[i] + B[i];
   }
-  return S;
+  return V;
 }
 
 matrix MathFunctions::matSum(const matrix &A, const matrix &B){
@@ -173,6 +172,14 @@ matrix MathFunctions::matSumValue(const matrix &A, const float B){
       }
   }
   return S;
+}
+
+matrix MathFunctions::initializeMatIdentity(int size){
+  matrix A = matrix(size, vector<float>(size, 0));
+  for (int i = 0; i < A.size(); i++){
+    A[i][i] = 1;
+  }
+  return A;
 }
 
 void MathFunctions::initializeMat(matrix &A){
@@ -406,8 +413,9 @@ vector<float> MathFunctions::quasiNewton(const vector<float> &X, matrix &H, int 
       return X;
     }
 
-    return quaseNewton(returnValue, newH, stepFunction, iteration);
+    return quasiNewton(returnValue, newH, stepFunction, iteration);
   }
+
   cout << "Finished because grad is 0" << endl;
   cout << "Iterations:" << iteration << endl;
   return X;

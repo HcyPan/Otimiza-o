@@ -76,6 +76,17 @@ void allFunctions(){
   vector<float> newtonGoldenSect = m_func.newton(vector <float> {5,6}, MathFunctions::getStepFunction::GoldenSect);
   m_func.printVec(newtonGoldenSect);
 
+  matrix identity = m_func.initializeMatIdentity(2);
+
+  cout << endl <<  "quasiNewton Function By Armijo Result" << endl << endl;
+  vector<float> quasiNewtonArmijo = m_func.quasiNewton(vector <float> {5,6}, identity, MathFunctions::getStepFunction::Armijo);
+  m_func.printVec(quasiNewtonArmijo);
+
+  cout << endl <<  "quasiNewton Function By Golden Section Result" << endl << endl;
+  vector<float> quasiNewtonGoldenSect = m_func.quasiNewton(vector <float> {5,6}, identity, MathFunctions::getStepFunction::GoldenSect);
+  m_func.printVec(quasiNewtonGoldenSect);
+
+
   cout << endl << "Fnished" << endl;
 }
 
