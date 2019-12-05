@@ -10,7 +10,7 @@
 #define ARMIJON 0.25
 #define ARMIJOY 0.8
 #define RANDOMMAX 1000
-#define MAXITERS 100
+#define MAXITERS 20000
 
 using namespace std;
 using matrix = vector<vector<float> >;
@@ -33,7 +33,7 @@ matrix MathFunctions::matMul(const matrix &A, const matrix &B){
       }
   }
   return C;
-};
+}
 
 vector<float> MathFunctions::vecMatMul(const vector<float> &A, const matrix &B){
 
@@ -50,7 +50,7 @@ vector<float> MathFunctions::vecMatMul(const vector<float> &A, const matrix &B){
       V[i] = aux;
   }
   return V;
-};
+}
 
 vector<float> MathFunctions::matVecMul(const matrix &A, const vector<float> &B){
 
@@ -67,7 +67,7 @@ vector<float> MathFunctions::matVecMul(const matrix &A, const vector<float> &B){
       V[i] = aux;
   }
   return V;
-};
+}
 
 float MathFunctions::vecMul(const vector<float> &A, const vector<float> &B){
   const int r = A.size();     // size of vector
@@ -87,10 +87,10 @@ vector<float> MathFunctions::vecMulFloat(vector<float> &A, float B){
     V[i] = A[i]*B;
   }
 
-  return V
+  return V;
 }
 
-vector<float> MathFunctions::vecMagicOperation(vector<float> &A, vector<float> &B, float C){
+vector<float> MathFunctions::vecMagicOperation(const vector<float> &A, const vector<float> &B, float C){
   const int r = A.size();     // size of vector
   
   vector<float> V = vector<float>(r, 0);
@@ -99,7 +99,7 @@ vector<float> MathFunctions::vecMagicOperation(vector<float> &A, vector<float> &
     V[i] = A[i] + C*B[i];
   }
 
-  return V
+  return V;
 }
 
 matrix MathFunctions::matSum(const matrix &A, const matrix &B){
@@ -115,7 +115,7 @@ matrix MathFunctions::matSum(const matrix &A, const matrix &B){
       }
   }
   return S;
-};
+}
 
 matrix MathFunctions::matSumValue(const matrix &A, const float B){
 
@@ -130,7 +130,7 @@ matrix MathFunctions::matSumValue(const matrix &A, const float B){
       }
   }
   return S;
-};
+}
 
 void MathFunctions::initializeMat(matrix &A){
   for (int i = 0; i < A.size(); i++){
@@ -138,13 +138,13 @@ void MathFunctions::initializeMat(matrix &A){
         A[i][j] = rand() % RANDOMMAX + 1;
     }
   }
-};
+}
 
 void MathFunctions::initializeVec(vector<float> &A){
   for (int i = 0; i < A.size(); i++){
       A[i] = rand() % RANDOMMAX + 1;
   }
-};
+}
 
 void MathFunctions::printMat(const matrix &A){
   for (int i = 0; i < A.size(); i++){
@@ -153,14 +153,14 @@ void MathFunctions::printMat(const matrix &A){
       }
       cout << endl;
   }
-};
+}
 
 void MathFunctions::printVec(const vector<float> &A){
   for (int i = 0; i < A.size(); i++){
         cout << A[i] << " ";
   }
   cout << endl;
-};
+}
 
 float MathFunctions::funcObj(const vector<float> &X){
   float res = -log((X[1]*X[0])/(1+pow((X[0]*X[1]),2)));
@@ -183,7 +183,7 @@ float MathFunctions::goldenSection(const vector<float> &X, const vector<float> &
   float eps = GOLDENSECTIONERROR, ro = GOLDENSECTIONRO;
 	float a = 0, s = ro , b = 2*ro;
   const float section = (3.0-sqrt(5.0))/2;
-	vector<float> delta = {section, 1 - (section)} ;
+	vector<float> delta = {section, 1 - (section)};
 
   while (phi(X, dir, b) < phi(X, dir, s)){
     a = s;
@@ -193,7 +193,7 @@ float MathFunctions::goldenSection(const vector<float> &X, const vector<float> &
 
   float ba = b-a;
 
-  vector<float> newDelta = vecMulFloat(delta, ba)
+  vector<float> newDelta = vecMulFloat(delta, ba);
 
   float u = a + newDelta[0];
   float v = a + newDelta[1];
@@ -227,21 +227,22 @@ float MathFunctions::armijo(const vector<float> &X, const vector<float> &dir){
   return t;
 }
 
-bool MathFunctions::isVecEqual(vector<float> &A, vector<float> &B){
+bool MathFunctions::isVecEqual(const vector<float> &A, vector<float> &B){
   const int r = A.size();  //size of vec
-  bool C = true
+  bool C = true;
 
   for (int i = 0; i < r; i++){
       C = C && (A[i] == B[i]);
   }
 
-  return C
+  return C;
 }
 
-vector<float> MathFunctions::gradient(const vector<float> &X, int stepFunction, int iteration = 0){
+vector<float> MathFunctions::gradient(const vector<float> &X, int stepFunction, int iteration){
   iteration++;
-  
+
   if (iteration == MAXITERS){
+    cout << "Finished after max iteration steps: " << iteration << endl;
     return X;
   }
 
@@ -257,32 +258,34 @@ vector<float> MathFunctions::gradient(const vector<float> &X, int stepFunction, 
       t = goldenSection(X, dir);
     }
     
-    vector<float> returnValue = vecMagicOperation(X, dir, t)
+    vector<float> returnValue = vecMagicOperation(X, dir, t);
 
     if (isVecEqual(X, returnValue)){ //checks if new X is equal
+      cout << "Finished after X equals to new X. " << endl;
       return X;
     }
 
-    return gradient(returnValue, stepFunction);
+    return gradient(returnValue, stepFunction, iteration);
   }
-
+  cout << "Finished because grad is 0" << endl;
   return X;
 }
 
-matrix MathFunctions::hessianInverted(vector<float> &X){
-  float denominator = pow(X[0],6) * pow(X[1],6)  - 9 * pow(X[0],4) * pow(X[1],4) + 7 * pow(X[0],2) * pow(X[1],2) + 1
-  float secondDiogonal = (4 * pow(X[0],3) * pow(X[1],3) * (pow(X[0],2) * pow(X[1],2) + 1))/denominator
-  float firstDiagonal11 = (-pow(X[1],6) * pow(X[0],8) + 3 * pow(X[1],4) * pow(X[0], 6) + 5* pow(X[1], 2) * pow(X[0], 4) + pow(X[0],2))/denominator
-  float firstDiagonal22 = (-pow(X[0],6) * pow(X[1],8) + 3 * pow(X[0],4) * pow(X[1], 6) + 5* pow(X[0], 2) * pow(X[1], 4) + pow(X[1],2))/denominator
+matrix MathFunctions::hessianInverted(const vector<float> &X){
+  float denominator = pow(X[0],6) * pow(X[1],6)  - 9 * pow(X[0],4) * pow(X[1],4) + 7 * pow(X[0],2) * pow(X[1],2) + 1;
+  float secondDiogonal = (4 * pow(X[0],3) * pow(X[1],3) * (pow(X[0],2) * pow(X[1],2) + 1))/denominator;
+  float firstDiagonal11 = (-pow(X[1],6) * pow(X[0],8) + 3 * pow(X[1],4) * pow(X[0], 6) + 5* pow(X[1], 2) * pow(X[0], 4) + pow(X[0],2))/denominator;
+  float firstDiagonal22 = (-pow(X[0],6) * pow(X[1],8) + 3 * pow(X[0],4) * pow(X[1], 6) + 5* pow(X[0], 2) * pow(X[1], 4) + pow(X[1],2))/denominator;
 
-  return {{firstDiagonal11, secondDiogonal}, {secondDiogonal, firstDiagonal22}}
+  return {{firstDiagonal11, secondDiogonal}, {secondDiogonal, firstDiagonal22}};
 }
 
 
-vector<float> MathFunctions::newton(const vector<float> &X, int stepFunction, int iteration = 0){
+vector<float> MathFunctions::newton(const vector<float> &X, int stepFunction, int iteration){
   iteration++;
   
   if (iteration == MAXITERS){
+    cout << "Finished after max iteration steps: " << iteration << endl;
     return X;
   }
 
@@ -291,23 +294,25 @@ vector<float> MathFunctions::newton(const vector<float> &X, int stepFunction, in
   float t = 0;
 
   if (grad[0] != 0 && grad[1] != 0){
-    matrix HI = hessianInverted(X)
-    vector<float> dir = -1 * matVecMul(HI, grad);
+    matrix HI = hessianInverted(X);
+    vector<float> HIgrad = matVecMul(HI, grad);
+    vector<float> dir = vecMulFloat(HIgrad, -1);
     if (stepFunction == 1){
       t = armijo(X, dir);
     }else{
       t = goldenSection(X, dir);
     }
     
-    vector<float> returnValue = vecMagicOperation(X, dir, t)
+    vector<float> returnValue = vecMagicOperation(X, dir, t);
 
     if (isVecEqual(X, returnValue)){ //checks if new X is equal
+      cout << "Finished after X equals to new X" << endl;
       return X;
     }
 
-    return newton(returnValue, stepFunction);
+    return newton(returnValue, stepFunction, iteration);
   }
-
+  cout << "Finished because grad is 0" << endl;
   return X;
 }
 

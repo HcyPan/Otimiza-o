@@ -1,5 +1,5 @@
-CXX=clang++
-CXXFLAGS=-std=c++11 -stdlib=libc++ -I headers -Wall -pedantic
+CXX=g++
+CXXFLAGS=-std=c++11 -I headers -Wall -pedantic
 BIN=bin
 
 SRC=$(wildcard src/*.cpp)

@@ -12,61 +12,69 @@ void allFunctions(){
   matrix B = matrix(5, vector<float>(5, 0));
   vector<float> V = vector<float>(5, 0);
 
-  m_func.initializeMat(A);
   cout << endl << "Matrix A" << endl << endl;
+  m_func.initializeMat(A);
   m_func.printMat(A);
 
-  m_func.initializeMat(B);
   cout << endl << "Matrix B" << endl << endl;
+  m_func.initializeMat(B);
   m_func.printMat(B);
 
-  m_func.initializeVec(V);
   cout << endl << "Vector V" << endl << endl;
+  m_func.initializeVec(V);
   m_func.printVec(V);
 
-  matrix M = m_func.matMul(A,B);
   cout << endl << "Matrix Multiplication Result" << endl << endl;
+  matrix M = m_func.matMul(A,B);
   m_func.printMat(M);
 
-  matrix S = m_func.matSum(A,B);
   cout << endl <<  "Matrix Summed Result" << endl << endl;
+  matrix S = m_func.matSum(A,B);
   m_func.printMat(S);
 
-  matrix S2 = m_func.matSumValue(A,5);
   cout << endl <<  "Matrix Summed Value Result" << endl << endl;
+  matrix S2 = m_func.matSumValue(A,5);
   m_func.printMat(S2);
 
-  vector<float> VR = m_func.vecMatMul(V,A);
   cout << endl <<  "Matrix Vector Multiplication Result" << endl << endl;
+  vector<float> VR = m_func.vecMatMul(V,A);
   m_func.printVec(VR);
 
-  float objValue = m_func.funcObj(vector <float> {5,6});
   cout << endl <<  "Objective Function Result" << endl << endl;
+  float objValue = m_func.funcObj(vector <float> {5,6});
   cout << objValue << endl;
 
-  float phiValue = m_func.phi(vector <float> {5,6}, vector <float> {2,3}, 2);
   cout << endl <<  "Phi Function Result" << endl << endl;
+  float phiValue = m_func.phi(vector <float> {5,6}, vector <float> {2,3}, 2);
   cout << phiValue << endl;
 
-  vector<float> dX = m_func.gradF(vector <float> {5,6});
   cout << endl <<  "gradF Function Result" << endl << endl;
+  vector<float> dX = m_func.gradF(vector <float> {5,6});
   m_func.printVec(dX);
 
-  float goldSect = m_func.goldenSection(vector <float> {5,6}, vector <float> {2,3});
   cout << endl <<  "Golden Section Function Result" << endl << endl;
+  float goldSect = m_func.goldenSection(vector <float> {5,6}, vector <float> {2,3});
   cout << goldSect << endl;
 
-  float armijo = m_func.armijo(vector <float> {5,6}, vector <float> {2,3});
   cout << endl <<  "Armijo Function Result" << endl << endl;
+  float armijo = m_func.armijo(vector <float> {5,6}, vector <float> {2,3});
   cout << armijo << endl;
 
-  vector<float> gradientArmijo = m_func.gradient(vector <float> {5,6}, MathFunctions::getStepFunction::Armijo);
   cout << endl <<  "Gradient Function By Armijo Result" << endl << endl;
+  vector<float> gradientArmijo = m_func.gradient(vector <float> {5,6}, MathFunctions::getStepFunction::Armijo);
   m_func.printVec(gradientArmijo);
 
+  cout << endl <<  "Gradient Function By Golden Section Result" << endl << endl;
   vector<float> gradientGoldSec = m_func.gradient(vector <float> {5,6}, MathFunctions::getStepFunction::GoldenSect);
-  cout << endl <<  "Armijo Function By Golden Section Result" << endl << endl;
   m_func.printVec(gradientGoldSec);
+
+  cout << endl <<  "Newton Function By Armijo Result" << endl << endl;
+  vector<float> newtonArmijo = m_func.newton(vector <float> {5,6}, MathFunctions::getStepFunction::Armijo);
+  m_func.printVec(newtonArmijo);
+
+  cout << endl <<  "Newton Function By Golden Section Result" << endl << endl;
+  vector<float> newtonGoldenSect = m_func.newton(vector <float> {5,6}, MathFunctions::getStepFunction::GoldenSect);
+  m_func.printVec(newtonGoldenSect);
 
   cout << endl << "Fnished" << endl;
 }

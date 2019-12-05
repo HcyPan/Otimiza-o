@@ -15,16 +15,16 @@ class MathFunctions {
     void initializeMat(matrix &A);
     void initializeVec(vector<float> &A);
 
-    bool isVecEqual(vector<float> &A, vector<float> &B);
+    bool isVecEqual(const vector<float> &A, vector<float> &B);
 
     matrix matMul(const matrix &A, const matrix &B);
     vector<float> vecMatMul(const vector<float> &A, const matrix &B);
     vector<float> matVecMul(const matrix &A, const vector<float> &B);
     float vecMul(const vector<float> &A, const vector<float> &B);
     vector<float> vecMulFloat(vector<float> &A, float B);
-    vector<float> MathFunctions::vecMagicOperation(vector<float> &A, vector<float> &B, float B)
+    vector<float> vecMagicOperation(const vector<float> &A, const vector<float> &B, float C);
 
-    matrix hessianInverted(vector<float> &X);
+    matrix hessianInverted(const vector<float> &X);
 
     matrix matSum(const matrix &A, const matrix &B);
     matrix matSumValue(const matrix &A, const float B);
